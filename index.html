@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A Burger Shooter game inside an oven." />
+  <title>Burger Oven Shooter</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+</head>
+
+<body>
+  <div id="launcher">
+    <h1>SELECT YOUR ADVENTURE</h1>
+    <div class="launcher-options">
+      <div class="launcher-card" id="launch-burger">
+        <div class="card-image burger-img"></div>
+        <h2>BURGER BATTLE</h2>
+        <p>A 3D FPS Shooter</p>
+        <button id="burger-play-btn">PLAY NOW</button>
+      </div>
+      <a href="./gingerbread/" class="launcher-card" id="launch-gingerbread" style="text-decoration: none;">
+        <div class="card-image gingerbread-img"></div>
+        <h2>GINGERBREAD RUN</h2>
+        <p>A 2D Platformer</p>
+        <button>PLAY NOW</button>
+      </a>
+    </div>
+  </div>
+
+  <div id="ui" style="display: none;">
+    <div id="main-menu">
+      <div id="hero-image">
+        <img src="menu_hero.png" alt="Burger shooting pickles at carrots">
+      </div>
+      <h1>BURGER BATTLE:<br>THE FOOD FIGHT</h1>
+      <div class="menu-buttons">
+        <button id="play-btn">Play Game</button>
+        <button id="models-btn">Character Models</button>
+        <button id="fullscreen-btn">Full Screen</button>
+      </div>
+    </div>
+
+    <div id="level-select" style="display: none;">
+      <h1>CHOOSE YOUR BATTLEGROUND</h1>
+      <div class="menu-buttons">
+        <button id="oven-btn">The Oven (Level 1)</button>
+        <button id="cupboard-btn">The Cupboard (Level 2)</button>
+        <button id="table-btn">The Table (Level 3)</button>
+        <button id="select-back-btn">Back</button>
+      </div>
+    </div>
+
+    <div id="game-ui" style="display: none;">
+      <div id="stats">
+        <div id="score">Score: 0</div>
+        <div id="health">Health: 100</div>
+        <div id="egg-count">Eggs: 1</div>
+      </div>
+      <div id="instructions">WASD to Move | Click to Shoot</div>
+      <div id="charge-container" style="display: none;">
+        <div id="charge-label">BONE SPEAR</div>
+        <div id="charge-bg">
+          <div id="charge-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="character-viewer" style="display: none;">
+      <div id="viewer-controls">
+        <button id="prev-btn">&lt;</button>
+        <span id="model-name">Burger</span>
+        <button id="next-btn">&gt;</button>
+      </div>
+      <button id="back-btn">Back to Menu</button>
+    </div>
+
+    <div id="crosshair" style="display: none;">+</div>
+    <div id="game-over" style="display: none;">
+      <h1>GAME OVER</h1>
+      <p>The carrots cooked the burger...</p>
+      <button onclick="location.reload()">Try Again</button>
+    </div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+
+</html>

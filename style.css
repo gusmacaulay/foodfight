@@ -1,0 +1,350 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #111;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+canvas {
+    display: block;
+}
+
+#ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    color: #ffaa44;
+    /* Burger bun orange */
+    text-shadow: 0 0 5px #000;
+}
+
+#ui button {
+    pointer-events: all;
+    background: #8b4513;
+    color: #fff;
+    border: 3px solid #ffaa44;
+    padding: 15px 30px;
+    font-family: inherit;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #441100;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+#ui button:hover {
+    background: #a0522d;
+}
+
+#ui button:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #441100;
+}
+
+#stats {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#score,
+#health {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#health {
+    color: #f00;
+    text-shadow: 0 0 5px #f00;
+}
+
+#instructions {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #fff;
+    text-shadow: 0 0 5px #fff;
+}
+
+#game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    border: 2px solid #f00;
+    color: #f00;
+    pointer-events: all;
+    box-shadow: 0 0 20px #f00;
+}
+
+#game-over h1 {
+    font-size: 48px;
+    margin: 0 0 10px 0;
+}
+
+#game-over button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 18px;
+    background: #f00;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 10px #f00;
+    pointer-events: auto;
+}
+
+#game-over button:hover {
+    background: #ff0000;
+    box-shadow: 0 0 20px #f00;
+}
+
+/* Main Menu */
+#main-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: auto;
+    z-index: 100;
+}
+
+#main-menu h1 {
+    font-size: 60px;
+    margin-bottom: 30px;
+    line-height: 0.9;
+    color: #ffaa44;
+    text-shadow: 5px 5px 0 #441100, 0 0 20px rgba(255, 170, 68, 0.5);
+}
+
+#hero-image {
+    margin-bottom: 20px;
+    border: 5px solid #ffaa44;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(255, 170, 68, 0.3);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#hero-image img {
+    width: 100%;
+    display: block;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Character Viewer */
+#character-viewer {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    pointer-events: auto;
+}
+
+#viewer-controls {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+#model-name {
+    font-size: 36px;
+    font-weight: bold;
+    min-width: 300px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#back-btn {
+    font-size: 18px;
+    padding: 10px 20px;
+}
+
+/* Bone Spear Charge Indicator */
+#charge-container {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+#charge-label {
+    font-size: 14px;
+    color: #f5f5dc;
+    margin-bottom: 5px;
+    text-shadow: 0 0 5px #000;
+}
+
+#charge-bg {
+    width: 200px;
+    height: 12px;
+    background: rgba(50, 50, 50, 0.8);
+    border: 2px solid #f5f5dc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+#charge-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #f5f5dc, #ffd700);
+    transition: width 0.05s linear;
+}
+
+/* Game Selector Launcher */
+#launcher {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #222 0%, #111 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#launcher h1 {
+    color: white;
+    font-size: 3em;
+    margin-bottom: 50px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.launcher-options {
+    display: flex;
+    gap: 40px;
+}
+
+.launcher-card {
+    display: block;
+    width: 280px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+}
+
+.launcher-card * {
+    pointer-events: none;
+}
+
+.launcher-card:hover {
+    transform: translateY(-15px) scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffd700;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.card-image {
+    width: 100%;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.burger-img {
+    background-image: linear-gradient(45deg, #ff4500, #ff8c00);
+    position: relative;
+    overflow: hidden;
+}
+
+.burger-img::after {
+    content: '🍔';
+    font-size: 80px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.gingerbread-img {
+    background-image: linear-gradient(45deg, #8b4513, #cd853f);
+    position: relative;
+    overflow: hidden;
+}
+
+.gingerbread-img::after {
+    content: '🍪';
+    font-size: 80px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.launcher-card h2 {
+    color: white;
+    margin: 10px 0;
+    font-size: 1.5em;
+}
+
+.launcher-card p {
+    color: #ccc;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+}
+
+.launcher-card button {
+    background: transparent;
+    color: white;
+    border: 2px solid #ffd700;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.launcher-card:hover button {
+    background: #ffd700;
+    color: #000;
+}

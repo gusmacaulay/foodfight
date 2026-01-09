@@ -1,0 +1,54 @@
+body {
+    background-color: #87CEEB;
+    /* Sky blue */
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+#game-container {
+    text-align: center;
+}
+
+h1 {
+    color: #fff;
+    text-shadow: 2px 2px 0 #d2691e;
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+canvas {
+    background-color: #f0f8ff;
+    /* AliceBlue */
+    border: 5px solid #d2691e;
+    /* Chocolate border */
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+#instructions {
+    margin-top: 10px;
+    color: #fff;
+    font-size: 1.2em;
+    text-shadow: 1px 1px 0 #000;
+}
+
+#ui-overlay {
+    background: rgba(210, 105, 30, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 5px;
+}
+
+#biscuit-count {
+    color: #ffd700;
+}
