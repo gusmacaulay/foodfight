@@ -40,7 +40,7 @@ export class Game {
         this.chocolates = new Chocolate(this.scene);
 
         // Game State
-        this.states = { MENU: 'MENU', PLAYING: 'PLAYING', VIEWER: 'VIEWER' };
+        this.states = { MENU: 'MENU', PLAYING: 'PLAYING', VIEWER: 'VIEWER', PAUSED: 'PAUSED' };
         this.state = this.states.MENU;
         this.playerHealth = 100;
         this.isGameOver = false;
@@ -63,6 +63,7 @@ export class Game {
         this.gameUI = document.getElementById('game-ui');
         this.viewerUI = document.getElementById('character-viewer');
         this.crosshair = document.getElementById('crosshair');
+        this.pauseMenu = document.getElementById('pause-menu');
 
         // Input state
         this.input = {
@@ -71,12 +72,22 @@ export class Game {
             left: false,
             right: false,
             shoot: false,
-            bomb: false
+            bomb: false,
+            // Player 2
+            forward2: false,
+            backward2: false,
+            left2: false,
+            right2: false,
+            shoot2: false
         };
 
         this.setupInputs();
         this.setupMenuButtons();
         this.setupLighting();
+        this.setupCustomization();
+
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
@@ -118,6 +129,12 @@ export class Game {
             case 'KeyA': this.input.left = isPressed; break;
             case 'KeyD': this.input.right = isPressed; break;
             case 'Space': this.input.bomb = isPressed; break;
+            // Player 2 Controls
+            case 'ArrowUp': this.input.forward2 = isPressed; break;
+            case 'ArrowDown': this.input.backward2 = isPressed; break;
+            case 'ArrowLeft': this.input.left2 = isPressed; break;
+            case 'ArrowRight': this.input.right2 = isPressed; break;
+            case 'Enter': if (isPressed) this.handleShoot(1); break;
             case 'Digit1':
                 if (this.hasBoneSpear && this.state === this.states.PLAYING) {
                     if (isPressed && !this.boneSpear.isCharging) {
@@ -129,25 +146,40 @@ export class Game {
                     }
                 }
                 break;
+            case 'Escape':
+                if (isPressed) this.togglePause();
+                break;
         }
     }
 
-    handleShoot() {
+    handleShoot(playerIdx = 0) {
         if (this.state === this.states.PLAYING) {
-            // Request pointer lock on click
-            if (document.pointerLockElement !== this.renderer.domElement) {
+            // Request pointer lock only on P1 click if needed
+            if (playerIdx === 0 && document.pointerLockElement !== this.renderer.domElement) {
                 this.renderer.domElement.requestPointerLock();
             }
         }
 
-        if (!this.player.mesh) return;
+        const actingPlayer = playerIdx === 0 ? this.player : this.player2;
+        if (!actingPlayer || !actingPlayer.mesh || actingPlayer.isDead) return;
 
-        // Get direction from player
         const direction = new THREE.Vector3();
-        this.player.mesh.getWorldDirection(direction);
+        actingPlayer.mesh.getWorldDirection(direction);
+        this.projectiles.shoot(actingPlayer.mesh.position, direction);
+    }
 
-        // Spawn pickle
-        this.projectiles.shoot(this.player.mesh.position, direction);
+    togglePause() {
+        if (this.state === this.states.PLAYING) {
+            this.state = this.states.PAUSED;
+            this.pauseMenu.style.display = 'flex';
+            this.crosshair.style.display = 'none';
+            document.exitPointerLock();
+        } else if (this.state === this.states.PAUSED) {
+            this.state = this.states.PLAYING;
+            this.pauseMenu.style.display = 'none';
+            this.crosshair.style.display = 'block';
+            this.renderer.domElement.requestPointerLock();
+        }
     }
 
     start() {
@@ -168,9 +200,21 @@ export class Game {
         if (this.state === this.states.PLAYING && !this.isGameOver) {
             // Updates
             this.player.update(dt, this.input);
+            if (this.isBattleMode && this.player2) {
+                const p2Input = {
+                    forward: this.input.forward2,
+                    backward: this.input.backward2,
+                    left: this.input.left2,
+                    right: this.input.right2
+                };
+                this.player2.update(dt, p2Input);
+                this.updateBattleCamera();
+            }
+
             this.projectiles.update(dt);
             this.eggSystem.update(dt);
             this.boneSpear.update(dt);
+            // ... rest of update
             if (this.boneSpear.isCharging) {
                 this.boneSpear.updateCharge(dt);
                 this.updateChargeUI();
@@ -260,12 +304,64 @@ export class Game {
         if (tableBtn) tableBtn.onclick = () => this.startAtLevel(3);
         if (selectBackBtn) selectBackBtn.onclick = () => this.showMainMenu();
 
+        const battleBtn = document.getElementById('battle-play-btn');
+        if (battleBtn) battleBtn.onclick = () => this.startBattleMode();
+
         this.viewerIndex = 0;
         this.viewerModels = ['Burger', 'Carrot', 'Roast Chicken', 'Peanut Jar', 'Peanut', 'Egg', 'Lolly Snake', 'Flour Bag', 'Cupcake'];
         const nextBtn = document.getElementById('next-btn');
         const prevBtn = document.getElementById('prev-btn');
         if (nextBtn) nextBtn.onclick = () => this.switchModel(1);
         if (prevBtn) prevBtn.onclick = () => this.switchModel(-1);
+
+        window.addEventListener('mousedown', (e) => this.onMouseDown(e));
+    }
+
+    onMouseDown(event) {
+        if (this.state !== this.states.VIEWER) return;
+
+        // Calculate mouse position in normalized device coordinates
+        this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        // Filter for Burger model (viewerMeshes[0])
+        const burgerModel = this.viewerMeshes[0];
+        if (!burgerModel || !burgerModel.visible) return;
+
+        const intersects = this.raycaster.intersectObject(burgerModel, true);
+
+        if (intersects.length > 0) {
+            this.showCustomization();
+        }
+    }
+
+    setupCustomization() {
+        const bunInput = document.getElementById('color-bun');
+        const pattyInput = document.getElementById('color-patty');
+        const cheeseInput = document.getElementById('color-cheese');
+        const pickleInput = document.getElementById('color-pickle');
+        const shockwaveInput = document.getElementById('color-shockwave');
+        const closeBtn = document.getElementById('close-custom-btn');
+
+        if (bunInput) bunInput.oninput = (e) => this.player.updateBunColor(e.target.value);
+        if (pattyInput) pattyInput.oninput = (e) => this.player.updatePattyColor(e.target.value);
+        if (cheeseInput) cheeseInput.oninput = (e) => this.player.updateCheeseColor(e.target.value);
+        if (pickleInput) pickleInput.oninput = (e) => this.projectiles.updatePickleColor(e.target.value);
+        if (shockwaveInput) shockwaveInput.oninput = (e) => this.eggSystem.updateShockwaveColor(e.target.value);
+
+        if (closeBtn) closeBtn.onclick = () => this.hideCustomization();
+    }
+
+    showCustomization() {
+        const panel = document.getElementById('customization-panel');
+        if (panel) panel.style.display = 'flex';
+    }
+
+    hideCustomization() {
+        const panel = document.getElementById('customization-panel');
+        if (panel) panel.style.display = 'none';
     }
 
     toggleFullscreen() {
@@ -459,7 +555,7 @@ export class Game {
         this.viewerMeshes.push(snakeViewer);
 
         // Flour Bag
-        const flourBossViewer = new FlourBagBoss(this.scene);
+        const flourBossViewer = new FlourBagBoss(this.scene, null);
         flourBossViewer.mesh.visible = false;
         flourBossViewer.mesh.position.set(0, 3, 0); // Center it
         this.scene.remove(flourBossViewer.mesh);
@@ -819,7 +915,7 @@ export class Game {
         while (this.peanutJars.peanuts.length > 0) this.peanutJars.removePeanut(this.peanutJars.peanuts[0]);
         while (this.lollySnakes.snakes.length > 0) this.lollySnakes.remove(this.lollySnakes.snakes[0]);
 
-        this.boss = new FlourBagBoss(this.scene);
+        this.boss = new FlourBagBoss(this.scene, () => this.victory());
 
         const instructions = document.getElementById('instructions');
         if (instructions) instructions.innerText = "BOSS FIGHT: THE FLOUR BAG!";

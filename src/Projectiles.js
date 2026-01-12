@@ -14,6 +14,14 @@ export class Projectiles {
         this.bumpMat = new THREE.MeshStandardMaterial({ color: 0x008800 });
     }
 
+    updatePickleColor(color) {
+        if (this.pickleMaterial) this.pickleMaterial.color.set(color);
+        if (this.bumpMat) {
+            const darkColor = new THREE.Color(color).multiplyScalar(0.6);
+            this.bumpMat.color.copy(darkColor);
+        }
+    }
+
     shoot(position, direction) {
         const pickle = new THREE.Mesh(this.pickleGeometry, this.pickleMaterial);
 

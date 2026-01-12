@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
 export class FlourBagBoss {
-    constructor(scene) {
+    constructor(scene, onDeath) {
         this.scene = scene;
+        this.onDeath = onDeath;
         this.mesh = this.createModel();
         this.health = 40;
         this.maxHealth = 40;
@@ -78,24 +79,30 @@ export class FlourBagBoss {
 
     takeDamage(amount) {
         this.health -= amount;
+
+        // Visual feedback (flash red like the other boss)
+        this.mesh.traverse(child => {
+            if (child.isMesh) {
+                if (child.material.color) {
+                    const oldColor = child.material.color.clone();
+                    child.material.color.set(0xff0000);
+                    setTimeout(() => {
+                        if (child.material) child.material.color.copy(oldColor);
+                    }, 100);
+                }
+            }
+        });
+
         if (this.health <= 0) {
             this.health = 0;
             this.die();
         }
-        // Visual feedback
-        this.mesh.traverse(child => {
-            if (child.isMesh && child.material.emissive) {
-                child.material.emissive.setHex(0xffffff);
-                setTimeout(() => {
-                    if (this.mesh) child.material.emissive.setHex(0x000000);
-                }, 100);
-            }
-        });
     }
 
     die() {
         this.isDead = true;
-        // Animation/Cleanup handled by Game
+        this.scene.remove(this.mesh);
+        if (this.onDeath) this.onDeath();
     }
 
     remove() {

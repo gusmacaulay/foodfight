@@ -11,6 +11,11 @@ export class EggSystem {
         this.eggGeo = new THREE.SphereGeometry(0.5, 12, 12);
         this.eggGeo.scale(0.8, 1.2, 0.8);
         this.eggMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+        this.shockwaveColor = 0xffaa00;
+    }
+
+    updateShockwaveColor(color) {
+        this.shockwaveColor = color;
     }
 
     spawnPickup(position) {
@@ -86,7 +91,7 @@ export class EggSystem {
         const expGeo = new THREE.TorusGeometry(1, 0.2, 8, 32);
         expGeo.rotateX(Math.PI / 2);
         const expMat = new THREE.MeshBasicMaterial({
-            color: 0xffaa00,
+            color: this.shockwaveColor,
             transparent: true,
             opacity: 1.0
         });

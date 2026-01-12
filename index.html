@@ -33,6 +33,12 @@
         <p>A 2D Platformer</p>
         <button>PLAY NOW</button>
       </a>
+      <div class="launcher-card" id="launch-battle">
+        <div class="card-image battle-img"></div>
+        <h2>BATTLE MODE</h2>
+        <p>Local PvP Battle</p>
+        <button id="battle-play-btn">START BATTLE</button>
+      </div>
     </div>
   </div>
 
@@ -61,9 +67,14 @@
 
     <div id="game-ui" style="display: none;">
       <div id="stats">
-        <div id="score">Score: 0</div>
-        <div id="health">Health: 100</div>
-        <div id="egg-count">Eggs: 1</div>
+        <div id="p1-ui">
+          <div id="score">Score: 0</div>
+          <div id="health">Player 1: 100</div>
+          <div id="egg-count">Eggs: 1</div>
+        </div>
+        <div id="p2-ui" style="display: none;">
+          <div id="health2">Player 2: 100</div>
+        </div>
       </div>
       <div id="instructions">WASD to Move | Click to Shoot</div>
       <div id="charge-container" style="display: none;">
@@ -83,11 +94,47 @@
       <button id="back-btn">Back to Menu</button>
     </div>
 
+    <div id="customization-panel" style="display: none;">
+      <h3>CUSTOMIZE BURGER</h3>
+      <div class="color-row">
+        <label>Bun:</label>
+        <input type="color" id="color-bun" value="#ffaa44">
+      </div>
+      <div class="color-row">
+        <label>Patty:</label>
+        <input type="color" id="color-patty" value="#441100">
+      </div>
+      <div class="color-row">
+        <label>Cheese:</label>
+        <input type="color" id="color-cheese" value="#ffdd00">
+      </div>
+      <div class="color-row">
+        <label>Pickle:</label>
+        <input type="color" id="color-pickle" value="#00cc00">
+      </div>
+      <div class="color-row">
+        <label>Shockwave:</label>
+        <input type="color" id="color-shockwave" value="#ffaa00">
+      </div>
+      <button id="close-custom-btn">Close</button>
+    </div>
+
     <div id="crosshair" style="display: none;">+</div>
+
+    <div id="pause-menu" style="display: none;">
+      <h1>PAUSED</h1>
+      <p>Press ESC to Resume</p>
+    </div>
+
     <div id="game-over" style="display: none;">
       <h1>GAME OVER</h1>
-      <p>The carrots cooked the burger...</p>
+      <p id="game-over-msg">The carrots cooked the burger...</p>
       <button onclick="location.reload()">Try Again</button>
+    </div>
+
+    <div id="battle-victory" style="display: none;">
+      <h1 id="winner-text">PLAYER 1 WINS!</h1>
+      <button onclick="location.reload()">Return to Menu</button>
     </div>
   </div>
   <script type="module" src="src/main.js"></script>
