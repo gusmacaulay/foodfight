@@ -19,12 +19,16 @@ export class Player {
         this.attacking = false;
         this.attackTimer = 0;
         this.attackDuration = 0.2; // 200ms
+        this.attackType = 'punch'; // 'punch' or 'kick'
     }
 
     attack() {
         if (!this.attacking) {
             this.attacking = true;
             this.attackTimer = this.attackDuration;
+
+            // Toggle attack type
+            this.attackType = (this.attackType === 'punch') ? 'kick' : 'punch';
         }
     }
 
@@ -143,17 +147,38 @@ export class Player {
         this.ctx.arc(renderX + 20, this.y + 36, 3, 0, Math.PI * 2);
         this.ctx.fill();
 
-        // Attack Animation (Rolling Pin)
+        // Attack Animation
         if (this.attacking) {
-            this.ctx.fillStyle = '#f0e68c'; // Khaki (Dough/Wood color)
-            this.ctx.save();
-            this.ctx.translate(renderX + 20, this.y + 30);
-            // Swipe motion
-            const swing = (this.attackDuration - this.attackTimer) / this.attackDuration;
-            const angle = -Math.PI / 4 + swing * Math.PI;
-            this.ctx.rotate(angle);
-            this.ctx.fillRect(10, -5, 40, 10);
-            this.ctx.restore();
+            // Punch
+            if (this.attackType === 'punch') {
+                this.ctx.fillStyle = this.color;
+                // Extend right arm
+                this.ctx.fillRect(renderX + 35 + 10, this.y + 22, 15, 8); // Extended arm
+
+                // Fist
+                this.ctx.fillStyle = '#A0522D'; // Darker for fist
+                this.ctx.beginPath();
+                this.ctx.arc(renderX + 35 + 10 + 15, this.y + 26, 6, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+            // Kick
+            else if (this.attackType === 'kick') {
+                // Retract normal right leg for visual clarity? Maybe just draw over it or let it be.
+                // Actually, let's draw an extended leg.
+
+                this.ctx.fillStyle = this.color;
+
+                // Leg extending out
+                ctx.save();
+                ctx.translate(renderX + 27, this.y + 45); // Pivot at hip/leg connection
+                ctx.rotate(-Math.PI / 4); // Kick up
+                ctx.fillRect(0, 0, 10, 20); // Leg
+
+                // Foot
+                ctx.fillStyle = 'white'; // Icing?
+                ctx.fillRect(0, 20, 10, 5);
+                ctx.restore();
+            }
         }
     }
 }
